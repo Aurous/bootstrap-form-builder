@@ -4,6 +4,10 @@
 - Support single / 2 column layouts.
 - Edit html on individual elements.
 
+### Use It Now:
+
+[http://frappe.github.io/bootstrap-form-builder/](http://frappe.github.io/bootstrap-form-builder/)
+
 ### License
 
 MIT

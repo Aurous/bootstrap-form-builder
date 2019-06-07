@@ -124,26 +124,38 @@
 				<template v-for="element in elements">
 					<div v-bind:id="element.id+'_draggable'" v-bind:data-size="element.colsize" class="form-group draggable">
 						<template v-if="element.label !== ''">
-							<label v-bind:for="element.id">{{ element.label }}</label>
+							<label class="form-control" v-bind:for="element.id">{{ element.label }}</label>
 						</template>
 						<template v-if="input_types.includes(element.type)">
-							<input v-bind:name="element.name" v-bind:id="element.id" v-bind:type="element.type" v-bind="element.attributes">
+							<input class="form-control" v-bind:name="element.name" v-bind:id="element.id" v-bind:type="element.type" v-bind="element.attributes">
 						</template>
 						<template v-else-if="element.type == 'select'">
-							<select v-bind:id="element.id" v-bind:name="element.name" class="form-control" v-bind="element.attributes">
+							<select class="form-control" v-bind:id="element.id" v-bind:name="element.name" class="form-control" v-bind="element.attributes">
 									<option v-for="option in element.options" v-bind:value="option.value">{{ option.name }}</option>
 							</select>
 						</template>
 						<template v-else-if="element.type == 'textarea'">
-							<textarea v-bind:id="element.id" v-bind:name="element.name" >{{ element.value }}</textarea>
+							<textarea class="form-control" v-bind:id="element.id" v-bind:name="element.name" >{{ element.value }}</textarea>
 						</template>
 						<template v-else-if="element.type == 'datalist'">
-							<input type="text" v-bind:id="element.id" v-bind:name="element.name" v-bind:list="element.id+'-datalist'">
+							<input class="form-control" type="text" v-bind:id="element.id" v-bind:name="element.name" v-bind:list="element.id+'-datalist'">
 							<datalist v-bind:id="element.id+'-datalist'">
 								<template v-for="option in element.options">
 									<option v-bind:value="option.name" v-bind:data-value="option.value"></option>
 								</template>
 							</datalist>
+						</template>
+						<template v-else-if="element.type == 'buttons'">
+							<button class="form-control" v-bind:name="element.name" v-bind:id="element.id" v-bind:type="element.type" v-bind="element.attributes">{{ element.value }}</button>
+						</template>
+						<template v-else-if="element.type == 'optgroup'">
+							<select class="form-control" v-bind:name="element.name" v-bind:id="element.id" v-bind="element.attributes">
+								<template v-for="(item, index) in element.options">
+									<optgroup v-bind:label="index">
+										<option v-for="option in item" v-bind:value="option.value">{{ option.name }}</option>
+									</optgroup>
+								</template>
+							</select>
 						</template>
 						<template v-if="element.desc !== ''">
 							<p class="help-block">{{ element.desc }}</p>
@@ -174,10 +186,12 @@ var app = new Vue({
 	data: {
 		input_types:["button","checkbox","color","date","datetime-local","email","file","hidden","image","month","number","password","radio","range","reset","search","submit","tel","text","time","url","week"],
 		elements:[
-			{"name":"button","id":"button","type":"button","colsize":[6,3,2],"label":"","desc":"button that does things","attributes":{"value":"test", "disabled":"true"}},
+			{"name":"button","id":"button","type":"buttons","colsize":[6,3,2],"label":"","desc":"button that does things","value":"test","attributes":{"disabled":"true"}},
+			{"name":"submit","id":"submit","type":"submit","colsize":[6,3,2],"label":"","desc":"Button to submit the form","attributes":{"value":"Submit"}},
 			{"name":"textarea","id":"textarea","type":"textarea","colsize":[12,11,10,9],"label":"","desc":"Select Thing Field","value":"testet"},
 			{"name":"select","id":"select","type":"select","colsize":[12,11,10,9],"label":"","desc":"Select Thing Field","options":[{"value":"1","name":"option 1"},{"value":"2","name":"option 2"}]},
-			{"name":"datalist","id":"datalist","type":"datalist","colsize":[12,11,10,9],"label":"","desc":"Select Thing Field","attributes":{"defaultValue":2},"options":[{"value":"1","name":"option 1"},{"value":"2","name":"option 2"}]}
+			{"name":"datalist","id":"datalist","type":"datalist","colsize":[12,11,10,9],"label":"","desc":"Select Thing Field","options":[{"value":"1","name":"something 1"},{"value":"2","name":"option 2"}]},
+			{"name":"optgroup","id":"optgroup","type":"optgroup","colsize":[12,11,10,9],"label":"","desc":"Select Thing Field","options":{"test":[{"value":"1","name":"option 1"},{"value":"7","name":"option 7"}],"label":[{"value":"2","name":"option 2"},{"value":"3","name":"option 3"}]}}
 		]
 	}
 })

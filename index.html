@@ -47,7 +47,6 @@
 						$($el).find("p").remove();
 					}
 					$('<p class="tools"><a class="remove-link">Remove</a> | <a class="edit-size">Size</a> | <a class="add-border">Show Border</a></p>').appendTo($el);
-					console.log($el);
 				} else {
 					if($(this)[0]!=$orig.parent()[0]){
 						var $el = $orig.clone().css({"position": "static", "left": null, "right": null}).appendTo(this);

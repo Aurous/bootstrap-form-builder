@@ -19,9 +19,10 @@
 	</style>
 	<script>
 	$(document).ready(function() {
-		setup_draggable();		
+		setup_draggable();	
+		
 	});
-	
+	var space = 1;
 	var setup_draggable = function() {
 		$( ".draggable" ).draggable({
 			appendTo: "body",
@@ -38,10 +39,15 @@
 					var el_dropped = "#"+$orig.attr('id')+".dropped";
 					if(!$("#"+$orig.attr('id')+".dropped").length){
 						var test = $(ui.draggable).attr('data-size').split(",");
-						var $el = $orig.clone().addClass("dropped").addClass("col-xs-"+test[0]).css({"position": "static", "left": null, "right": null}).appendTo(this);		
+						var $el  = $orig.clone().addClass("dropped").addClass("col-xs-"+test[0]).css({"position": "static", "left": null, "right": null}).appendTo(this);
+						if($($el).attr("id") == "space"){
+							$el.attr("id","space-"+space);
+							space++;
+						}
 						$($el).find("p").remove();
 					}
 					$('<p class="tools"><a class="remove-link">Remove</a> | <a class="edit-size">Size</a> | <a class="add-border">Show Border</a></p>').appendTo($el);
+					console.log($el);
 				} else {
 					if($(this)[0]!=$orig.parent()[0]){
 						var $el = $orig.clone().css({"position": "static", "left": null, "right": null}).appendTo(this);
@@ -115,74 +121,76 @@
 	</script>
 </head>
 <body style="background-color: #ddd;">
-	<div class="container">
-	<div id="vue" class="row">
-		<br />
-		<div  class="col-md-3" style="background-color: #fff;">
-			<h3>Elements</h3>
-			<form role="form-inline">
-				<template v-for="element in elements">
-					<div v-bind:id="element.id+'_draggable'" v-bind:data-size="element.colsize" class="form-group draggable">
-						<template v-if="element.label !== ''">
-							<label class="form-control" v-bind:for="element.id">{{ element.label }}</label>
-						</template>
-						<template v-if="input_types.includes(element.type)">
-							<input class="form-control" v-bind:name="element.name" v-bind:id="element.id" v-bind:type="element.type" v-bind="element.attributes">
-						</template>
-						<template v-else-if="element.type == 'select'">
-							<select class="form-control" v-bind:id="element.id" v-bind:name="element.name" class="form-control" v-bind="element.attributes">
-									<option v-for="option in element.options" v-bind:value="option.value">{{ option.name }}</option>
-							</select>
-						</template>
-						<template v-else-if="element.type == 'textarea'">
-							<textarea class="form-control" v-bind:id="element.id" v-bind:name="element.name" >{{ element.value }}</textarea>
-						</template>
-						<template v-else-if="element.type == 'datalist'">
-							<input class="form-control" type="text" v-bind:id="element.id" v-bind:name="element.name" v-bind:list="element.id+'-datalist'">
-							<datalist v-bind:id="element.id+'-datalist'">
-								<template v-for="option in element.options">
-									<option v-bind:value="option.name" v-bind:data-value="option.value"></option>
-								</template>
-							</datalist>
-						</template>
-						<template v-else-if="element.type == 'buttons'">
-							<button class="form-control" v-bind:name="element.name" v-bind:id="element.id" v-bind:type="element.type" v-bind="element.attributes">{{ element.value }}</button>
-						</template>
-						<template v-else-if="element.type == 'optgroup'">
-							<select class="form-control" v-bind:name="element.name" v-bind:id="element.id" v-bind="element.attributes">
-								<template v-for="(item, index) in element.options">
-									<optgroup v-bind:label="index">
-										<option v-for="option in item" v-bind:value="option.value">{{ option.name }}</option>
-									</optgroup>
-								</template>
-							</select>
-						</template>
-						<template v-if="element.desc !== ''">
-							<p class="help-block">{{ element.desc }}</p>
-						</template>
+	<div id="vue" class="container">
+		<div class="row">
+			<br />
+			<div  class="col-md-3" style="background-color: #fff;">
+				<h3>Elements</h3>
+				<form role="form-inline">
+					<template v-for="element in elements">
+						<div v-bind:id="element.id+'_draggable'" v-bind:data-size="element.colsize" class="form-group draggable">
+							<template v-if="element.label !== ''">
+								<label class="form-control" v-bind:for="element.id">{{ element.label }}</label>
+							</template>
+							<template v-if="input_types.includes(element.type)">
+								<input class="form-control" v-bind:name="element.name" v-bind:id="element.id" v-bind:type="element.type" v-bind="element.attributes">
+							</template>
+							<template v-else-if="element.type == 'select'">
+								<select class="form-control" v-bind:id="element.id" v-bind:name="element.name" class="form-control" v-bind="element.attributes">
+										<option v-for="option in element.options" v-bind:value="option.value">{{ option.name }}</option>
+								</select>
+							</template>
+							<template v-else-if="element.type == 'textarea'">
+								<textarea class="form-control" v-bind:id="element.id" v-bind:name="element.name" >{{ element.value }}</textarea>
+							</template>
+							<template v-else-if="element.type == 'datalist'">
+								<input class="form-control" type="text" v-bind:id="element.id" v-bind:name="element.name" v-bind:list="element.id+'-datalist'">
+								<datalist v-bind:id="element.id+'-datalist'">
+									<template v-for="option in element.options">
+										<option v-bind:value="option.name" v-bind:data-value="option.value"></option>
+									</template>
+								</datalist>
+							</template>
+							<template v-else-if="element.type == 'buttons'">
+								<button class="form-control" v-bind:name="element.name" v-bind:id="element.id" v-bind:type="element.type" v-bind="element.attributes">{{ element.value }}</button>
+							</template>
+							<template v-else-if="element.type == 'optgroup'">
+								<select class="form-control" v-bind:name="element.name" v-bind:id="element.id" v-bind="element.attributes">
+									<template v-for="(item, index) in element.options">
+										<optgroup v-bind:label="index">
+											<option v-for="option in item" v-bind:value="option.value">{{ option.name }}</option>
+										</optgroup>
+									</template>
+								</select>
+							</template>
+							<template v-if="element.desc !== ''">
+								<p class="help-block">{{ element.desc }}</p>
+							</template>
+						</div>
+					</template>
+					<div id="space" class="form-group draggable" data-size="12,11,10,9,8,7,6,5,4,3,2,1">
+						<span>Spacing Element</span>
+						<p class="help-block">Object used to space items apart</p>
 					</div>
-				</template>
-				<div class="form-group draggable" data-size="12,11,10,9,8,7,6,5,4,3,2,1">
-					<span>Spacing Element</span>
-					<p class="help-block">Object used to space items apart</p>
-				</div>
-			</form>
-		</div>
-		<div class="col-md-9">
-			<div style="background-color: #fff; padding: 20px; ">
-				<div class="text-muted empty-form text-center" style="font-size: 24px;">Drag & Drop elements to build form.</div>
-				<div class="row form-body  form-inline">
-					<div class="col-md-12 droppable sortable" >
+				</form>
+			</div>
+			<div class="col-md-9">
+				<div style="background-color: #fff; padding: 20px; ">
+					<div class="text-muted empty-form text-center" style="font-size: 24px;">Drag & Drop elements to build form.</div>
+					<div class="row form-body  form-inline">
+						<div class="col-md-12 droppable sortable">
+						</div>
 					</div>
 				</div>
 			</div>
 		</div>
-		<div class="col-md-9">
-			<form role="form-inline">
-				<textarea rows="15" class="form-control" id="update" @input='update'></textarea>
-			</form>
+		<div class="row">
+			<div class="col-md-12">
+				<form role="form-inline">
+					<textarea rows="15" class="form-control" id="update" @input='update'></textarea>
+				</form>
+			</div>
 		</div>
-	</div>
 	</div>
 </body>
 <script>

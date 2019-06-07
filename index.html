@@ -186,26 +186,26 @@
 	</div>
 </body>
 <script>
-var element_vue = new Vue({
-	el: '#vue',
-	data: {
-		input_types:["button","checkbox","color","date","datetime-local","email","file","hidden","image","month","number","password","radio","range","reset","search","submit","tel","text","time","url","week"],
-		elements:[
-			{"name":"button","id":"button","type":"buttons","colsize":[6,3,2],"label":"","desc":"button that does things","value":"test","attributes":{"disabled":"true"}},
-			{"name":"submit","id":"submit","type":"submit","colsize":[6,3,2],"label":"","desc":"Button to submit the form","attributes":{"value":"Submit"}},
-			{"name":"textarea","id":"textarea","type":"textarea","colsize":[12,11,10,9],"label":"","desc":"Select Thing Field","value":"testet"},
-			{"name":"select","id":"select","type":"select","colsize":[12,11,10,9],"label":"","desc":"Select Thing Field","options":[{"value":"1","name":"option 1"},{"value":"2","name":"option 2"}]},
-			{"name":"datalist","id":"datalist","type":"datalist","colsize":[12,11,10,9],"label":"","desc":"Select Thing Field","options":[{"value":"1","name":"something 1"},{"value":"2","name":"option 2"}]},
-			{"name":"optgroup","id":"optgroup","type":"optgroup","colsize":[12,11,10,9],"label":"","desc":"Select Thing Field","options":{"test":[{"value":"1","name":"option 1"},{"value":"7","name":"option 7"}],"label":[{"value":"2","name":"option 2"},{"value":"3","name":"option 3"}]}}
-		]
-	},
-	methods: {
-		update: function(event){
-			this.elements = JSON.parse(event.target.value);
-			console.log(element_vue.elements);
+	var element_vue = new Vue({
+		el: '#vue',
+		data: {
+			input_types:["button","checkbox","color","date","datetime-local","email","file","hidden","image","month","number","password","radio","range","reset","search","submit","tel","text","time","url","week"],
+			elements:[
+				{"name":"button","id":"button","type":"buttons","colsize":[6,3,2],"label":"","desc":"button that does things","value":"test","attributes":{"disabled":"true"}},
+				{"name":"submit","id":"submit","type":"submit","colsize":[6,3,2],"label":"","desc":"Button to submit the form","attributes":{"value":"Submit"}},
+				{"name":"textarea","id":"textarea","type":"textarea","colsize":[12,11,10,9],"label":"","desc":"Select Thing Field","value":"testet"},
+				{"name":"select","id":"select","type":"select","colsize":[12,11,10,9],"label":"","desc":"Select Thing Field","options":[{"value":"1","name":"option 1"},{"value":"2","name":"option 2"}]},
+				{"name":"datalist","id":"datalist","type":"datalist","colsize":[12,11,10,9],"label":"","desc":"Select Thing Field","options":[{"value":"1","name":"something 1"},{"value":"2","name":"option 2"}]},
+				{"name":"optgroup","id":"optgroup","type":"optgroup","colsize":[12,11,10,9],"label":"","desc":"Select Thing Field","options":{"test":[{"value":"1","name":"option 1"},{"value":"7","name":"option 7"}],"label":[{"value":"2","name":"option 2"},{"value":"3","name":"option 3"}]}}
+			]
+		},
+		methods: {
+			update: function(event){
+				this.elements = JSON.parse(event.target.value);
+				$(".col-md-12.droppable.sortable").text("");
+			}
 		}
-	}
-})
-$("#update").append(JSON.stringify(element_vue.elements));
+	})
+	$("#update").append(JSON.stringify(element_vue.elements));
 </script>
 </html>

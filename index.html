@@ -116,9 +116,9 @@
 </head>
 <body style="background-color: #ddd;">
 	<div class="container">
-	<div class="row">
+	<div id="vue" class="row">
 		<br />
-		<div id="vue" class="col-md-3" style="background-color: #fff;">
+		<div  class="col-md-3" style="background-color: #fff;">
 			<h3>Elements</h3>
 			<form role="form-inline">
 				<template v-for="element in elements">
@@ -177,11 +177,16 @@
 				</div>
 			</div>
 		</div>
+		<div class="col-md-9">
+			<form role="form-inline">
+				<textarea height="200px" class="form-control" id="update" @input='update'></textarea>
+			</form>
+		</div>
 	</div>
 	</div>
 </body>
 <script>
-var app = new Vue({
+var element_vue = new Vue({
 	el: '#vue',
 	data: {
 		input_types:["button","checkbox","color","date","datetime-local","email","file","hidden","image","month","number","password","radio","range","reset","search","submit","tel","text","time","url","week"],
@@ -193,7 +198,14 @@ var app = new Vue({
 			{"name":"datalist","id":"datalist","type":"datalist","colsize":[12,11,10,9],"label":"","desc":"Select Thing Field","options":[{"value":"1","name":"something 1"},{"value":"2","name":"option 2"}]},
 			{"name":"optgroup","id":"optgroup","type":"optgroup","colsize":[12,11,10,9],"label":"","desc":"Select Thing Field","options":{"test":[{"value":"1","name":"option 1"},{"value":"7","name":"option 7"}],"label":[{"value":"2","name":"option 2"},{"value":"3","name":"option 3"}]}}
 		]
+	},
+	methods: {
+		update: function(event){
+			this.elements = JSON.parse(event.target.value);
+			console.log(element_vue.elements);
+		}
 	}
 })
+$("#update").append(JSON.stringify(element_vue.elements));
 </script>
 </html>

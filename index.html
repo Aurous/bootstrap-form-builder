@@ -13,7 +13,7 @@
 	<style>
 		.droppable-active { background-color: #ffe !important; }
 		.tools a { cursor: pointer; font-size: 80%; }
-		.form-body .col-md-6, .form-body .col-md-12 { min-height: 500px; }
+		.form-body .col-md-12 { min-height: 500px !important; overflow-y:auto !important; max-height:500px !important; }
 		.draggable { cursor: move; }
 		.form-group.dropped{ height: 100px; }
 	</style>
@@ -123,7 +123,7 @@
 	<div id="vue" class="container">
 		<div class="row">
 			<br />
-			<div  class="col-md-3" style="background-color: #fff;">
+			<div  class="col-md-3 filters" style="background-color: #fff;">
 				<h3>Elements</h3>
 				<form role="form-inline">
 					<template v-for="element in elements">
@@ -173,7 +173,7 @@
 					</div>
 				</form>
 			</div>
-			<div class="col-md-9">
+			<div class="col-md-8">
 				<div style="background-color: #fff; padding: 20px; ">
 					<div class="text-muted empty-form text-center" style="font-size: 24px;">Drag & Drop elements to build form.</div>
 					<div class="row form-body  form-inline">
@@ -181,6 +181,10 @@
 						</div>
 					</div>
 				</div>
+			</div>
+			<div class="col-md-1">
+				<input type="button" id="export" name="export">
+				<input type="button" id="advanced" name="advanced">
 			</div>
 		</div>
 		<div class="row">

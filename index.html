@@ -16,6 +16,7 @@
 		.form-body .col-md-12 { min-height: 500px !important; overflow-y:auto !important; max-height:500px !important; }
 		.draggable { cursor: move; }
 		.form-group.dropped{ height: 100px; }
+		.container { max-width: 1500px !important; }
 	</style>
 	<script>
 	$(document).ready(function() {
@@ -40,13 +41,17 @@
 					if(!$("#"+$orig.attr('id')+".dropped").length){
 						var test = $(ui.draggable).attr('data-size').split(",");
 						var $el  = $orig.clone().addClass("dropped").addClass("col-xs-"+test[0]).css({"position": "static", "left": null, "right": null}).appendTo(this);
+						$($el).find("p").remove();
 						if($($el).attr("id") == "space"){
 							$el.attr("id","space-"+space);
 							space++;
+							$('<p class="tools"><a class="remove-link">Remove</a> | <a class="edit-size">Size</a> | <a class="add-border">Show Border</a></p>').appendTo($el);
+						}else{
+							$('<p class="tools"><a class="remove-link">Remove</a> | <a class="edit-size">Size</a> | <a class="edit-css">CSS</a> | <a class="edit=events">Events</a> | <a class="add-border">Show Border</a> </p>').appendTo($el);
 						}
-						$($el).find("p").remove();
+						
+						
 					}
-					$('<p class="tools"><a class="remove-link">Remove</a> | <a class="edit-size">Size</a> | <a class="add-border">Show Border</a></p>').appendTo($el);
 				} else {
 					if($(this)[0]!=$orig.parent()[0]){
 						var $el = $orig.clone().css({"position": "static", "left": null, "right": null}).appendTo(this);
@@ -57,7 +62,7 @@
 		}).sortable();
 	}
 	
-	var get_modal = function(modal_id, sizes) {
+	var size_modal = function(modal_id, sizes) {
 		var size_options = '';
 		$.each(sizes.split(","),function(key, value){
 			size_options += "<option value="+value+">"+value+"</option>";
@@ -81,6 +86,47 @@
 			</div>').appendTo(document.body);
 		return modal;
 	};
+	var css_modal = function(modal_id, css) {
+		var modal = $('<div id="modal-'+modal_id+'" class="modal" style="overflow: auto;" tabindex="-1">\
+			<div class="modal-dialog">\
+				<div class="modal-content">\
+					<div class="modal-header">\
+						<a type="button" class="close"\
+							data-dismiss="modal" aria-hidden="true">&times;</a>\
+						<h4 class="modal-title">Change Size</h4>\
+					</div>\
+					<div class="modal-body ui-front">\
+						<div class="form-group col-xs-10">\
+							<textarea class="form-control" id="n-columns">'+css+'</textarea>\
+						</div>\
+						<button class="btn btn-success">Change</button>\
+					</div>\
+				</div>\
+			</div>\
+			</div>').appendTo(document.body);
+		return modal;
+	};
+	
+	var event_modal = function(modal_id, events) {
+		var modal = $('<div id="modal-'+modal_id+'" class="modal" style="overflow: auto;" tabindex="-1">\
+			<div class="modal-dialog">\
+				<div class="modal-content">\
+					<div class="modal-header">\
+						<a type="button" class="close"\
+							data-dismiss="modal" aria-hidden="true">&times;</a>\
+						<h4 class="modal-title">Change Size</h4>\
+					</div>\
+					<div class="modal-body ui-front">\
+						<div class="form-group col-xs-10">\
+							<select class="form-control" id="n-columns">'+events+'</select>\
+						</div>\
+						<button class="btn btn-success">Change</button>\
+					</div>\
+				</div>\
+			</div>\
+			</div>').appendTo(document.body);
+		return modal;
+	};
 	
 	$(document).on("click", ".edit-size", function(ev) {
 		var $el = $(this).parent().parent();
@@ -88,7 +134,7 @@
 		var modal_id = '#modal-'+$el.attr("id");
 		var $edit_btn = $el_copy.find(".edit-size").parent().remove();
 		if(!$(modal_id).length){
-			var $modal = get_modal($el.attr("id"), $el.attr("data-size")).modal("show");
+			var $modal = size_modal($el.attr("id"), $el.attr("data-size")).modal("show");
 		}else{
 			var $modal = $(modal_id).modal("show");
 			
@@ -117,13 +163,21 @@
 			$(this).parent().parent().css("border", "1px solid rgb(0, 0, 0)");
 		}
 	});
+	
+	$(document).on("click", ".show-advanced", function(){
+		if($("#update").css("display") == "none"){
+			$("#update").show();
+		}else{
+			$("#update").hide();
+		}
+	});
 	</script>
 </head>
 <body style="background-color: #ddd;">
 	<div id="vue" class="container">
 		<div class="row">
 			<br />
-			<div  class="col-md-3 filters" style="background-color: #fff;">
+			<div  class="col-md-2 filters" style="background-color: #fff;">
 				<h3>Elements</h3>
 				<form role="form-inline">
 					<template v-for="element in elements">
@@ -182,15 +236,20 @@
 					</div>
 				</div>
 			</div>
-			<div class="col-md-1">
-				<input type="button" id="export" name="export">
-				<input type="button" id="advanced" name="advanced">
+			<div class="col-md-2" style="background-color: #fff;">
+				<br />
+				<form role="form-inline">
+					<input class="form-control " type="button" id="export" name="export" value="Export">
+					<br />
+					<input class="form-control show-advanced" type="button" id="advanced" name="advanced" value="Advanced">
+				</form>
+				<br />
 			</div>
 		</div>
 		<div class="row">
 			<div class="col-md-12">
 				<form role="form-inline">
-					<textarea rows="15" class="form-control" id="update" @input='update'></textarea>
+					<textarea rows="15" class="form-control" id="update" @input='update' style="display: none;"></textarea>
 				</form>
 			</div>
 		</div>

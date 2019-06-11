@@ -36,18 +36,18 @@
 			drop: function( event, ui ) {
 				$(".empty-form").remove();
 				var $orig = $(ui.draggable)
-				if(!$(ui.draggable).hasClass("dropped")) {
-					var el_dropped = "#"+$orig.attr('id')+".dropped";
+				//if(!$(ui.draggable).hasClass("dropped")) {
+				if(!$orig.hasClass("dropped")) {
 					if(!$("#"+$orig.attr('id')+".dropped").length){
-						var test = $(ui.draggable).attr('data-size').split(",");
-						var $el  = $orig.clone().addClass("dropped").addClass("col-xs-"+test[0]).css({"position": "static", "left": null, "right": null}).appendTo(this);
+						var col_size = $(ui.draggable).attr('data-size').split(",");
+						var $el  = $orig.clone().addClass("dropped").addClass("col-xs-"+col_size[0]).css({"position": "static", "left": null, "right": null}).appendTo(this);
 						$($el).find("p").remove();
 						if($($el).attr("id") == "space"){
 							$el.attr("id","space-"+space);
 							space++;
-							$('<p class="tools"><a class="remove-link">Remove</a> | <a class="edit-size">Size</a> | <a class="add-border">Show Border</a></p>').appendTo($el);
+							$('<p class="tools"><a class="remove-link">Remove</a> | <a class="edit-size">Size</a></p>').appendTo($el);
 						}else{
-							$('<p class="tools"><a class="remove-link">Remove</a> | <a class="edit-size">Size</a> | <a class="edit-css">CSS</a> | <a class="edit=events">Events</a> | <a class="add-border">Show Border</a> </p>').appendTo($el);
+							$('<p class="tools"><a class="remove-link">Remove</a> | <a class="edit-size">Size</a> | <a class="edit-css">CSS</a> | <a class="edit=events">Events</a></p>').appendTo($el);
 						}
 						
 						
@@ -62,79 +62,41 @@
 		}).sortable();
 	}
 	
-	var size_modal = function(modal_id, sizes) {
-		var size_options = '';
-		$.each(sizes.split(","),function(key, value){
-			size_options += "<option value="+value+">"+value+"</option>";
-		});
-		var modal = $('<div id="modal-'+modal_id+'" class="modal" style="overflow: auto;" tabindex="-1">\
-			<div class="modal-dialog">\
-				<div class="modal-content">\
-					<div class="modal-header">\
-						<a type="button" class="close"\
-							data-dismiss="modal" aria-hidden="true">&times;</a>\
-						<h4 class="modal-title">Change Size</h4>\
-					</div>\
-					<div class="modal-body ui-front">\
-						<div class="form-group col-xs-10">\
-							<select class="form-control" id="n-columns">'+size_options+'</select>\
-						</div>\
-						<button class="btn btn-success">Change</button>\
-					</div>\
-				</div>\
-			</div>\
-			</div>').appendTo(document.body);
-		return modal;
-	};
-	var css_modal = function(modal_id, css) {
-		var modal = $('<div id="modal-'+modal_id+'" class="modal" style="overflow: auto;" tabindex="-1">\
-			<div class="modal-dialog">\
-				<div class="modal-content">\
-					<div class="modal-header">\
-						<a type="button" class="close"\
-							data-dismiss="modal" aria-hidden="true">&times;</a>\
-						<h4 class="modal-title">Change Size</h4>\
-					</div>\
-					<div class="modal-body ui-front">\
-						<div class="form-group col-xs-10">\
-							<textarea class="form-control" id="n-columns">'+css+'</textarea>\
-						</div>\
-						<button class="btn btn-success">Change</button>\
-					</div>\
-				</div>\
-			</div>\
-			</div>').appendTo(document.body);
-		return modal;
+	var get_modal = function(modal_id, type, sizes) {
+		if(typeof(type) == "string"){
+			var modal_html = '<div id="modal-'+modal_id+'-'+type+'" class="modal" style="overflow: auto;" tabindex="-1">'
+			modal_html +=		'<div class="modal-dialog">'
+			modal_html +=				'<div class="modal-content">'
+			modal_html +=					'<div class="modal-header">'
+			modal_html +=						'<a type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</a>'
+			modal_html +=						'<h4 class="modal-title">Change Size</h4>'
+			modal_html +=					'</div>'
+			modal_html +=					'<div class="modal-body ui-front">'
+				if(type == "size"){
+					var size_options = '';
+					$.each(sizes.split(","),function(key, value){
+						size_options += "<option value="+value+">"+value+"</option>";
+					});
+			modal_html +=						'<div class="form-group col-xs-10">'
+			modal_html +=							'<select class="form-control" id="n-columns">'+size_options+'</select>'
+			modal_html +=						'</div>'
+			modal_html +=						'<button class="btn btn-success">Change</button>'
+				}
+				
+			modal_html +=					'</div>'
+			modal_html +=				'</div>'
+			modal_html +=			'</div>'
+			modal_html +=		'</div>'
+			return modal = $(modal_html).appendTo(document.body);
+		}
 	};
 	
-	var event_modal = function(modal_id, events) {
-		var modal = $('<div id="modal-'+modal_id+'" class="modal" style="overflow: auto;" tabindex="-1">\
-			<div class="modal-dialog">\
-				<div class="modal-content">\
-					<div class="modal-header">\
-						<a type="button" class="close"\
-							data-dismiss="modal" aria-hidden="true">&times;</a>\
-						<h4 class="modal-title">Change Size</h4>\
-					</div>\
-					<div class="modal-body ui-front">\
-						<div class="form-group col-xs-10">\
-							<select class="form-control" id="n-columns">'+events+'</select>\
-						</div>\
-						<button class="btn btn-success">Change</button>\
-					</div>\
-				</div>\
-			</div>\
-			</div>').appendTo(document.body);
-		return modal;
-	};
 	
 	$(document).on("click", ".edit-size", function(ev) {
 		var $el = $(this).parent().parent();
-		var $el_copy = $el.clone();
 		var modal_id = '#modal-'+$el.attr("id");
-		var $edit_btn = $el_copy.find(".edit-size").parent().remove();
 		if(!$(modal_id).length){
-			var $modal = size_modal($el.attr("id"), $el.attr("data-size")).modal("show");
+			var $modal = get_modal($el.attr("id"), "size", $el.attr("data-size")).modal("show");
 		}else{
 			var $modal = $(modal_id).modal("show");
 			

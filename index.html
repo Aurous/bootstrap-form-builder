@@ -36,7 +36,6 @@
 			drop: function( event, ui ) {
 				$(".empty-form").remove();
 				var $orig = $(ui.draggable)
-				//if(!$(ui.draggable).hasClass("dropped")) {
 				if(!$orig.hasClass("dropped")) {
 					if(!$("#"+$orig.attr('id')+".dropped").length){
 						var col_size = $(ui.draggable).attr('data-size').split(",");
@@ -69,10 +68,10 @@
 			modal_html +=				'<div class="modal-content">'
 			modal_html +=					'<div class="modal-header">'
 			modal_html +=						'<a type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</a>'
-			modal_html +=						'<h4 class="modal-title">Change Size</h4>'
+			modal_html +=						'<h4 class="modal-title">Change '+type+'</h4>'
 			modal_html +=					'</div>'
 			modal_html +=					'<div class="modal-body ui-front">'
-				if(type == "size"){
+				if(type == "Size"){
 					var size_options = '';
 					$.each(sizes.split(","),function(key, value){
 						size_options += "<option value="+value+">"+value+"</option>";
@@ -81,6 +80,8 @@
 			modal_html +=							'<select class="form-control" id="n-columns">'+size_options+'</select>'
 			modal_html +=						'</div>'
 			modal_html +=						'<button class="btn btn-success">Change</button>'
+				}else if(type == "CSS"){
+			modal_html +=						'<button class="btn btn-success">Close</button>'
 				}
 				
 			modal_html +=					'</div>'
@@ -94,9 +95,9 @@
 	
 	$(document).on("click", ".edit-size", function(ev) {
 		var $el = $(this).parent().parent();
-		var modal_id = '#modal-'+$el.attr("id");
+		var modal_id = '#modal-'+$el.attr("id")+'-size';
 		if(!$(modal_id).length){
-			var $modal = get_modal($el.attr("id"), "size", $el.attr("data-size")).modal("show");
+			var $modal = get_modal($el.attr("id"), "Size", $el.attr("data-size")).modal("show");
 		}else{
 			var $modal = $(modal_id).modal("show");
 			
@@ -104,6 +105,21 @@
 		$modal.find(".btn-success").click(function() {
 			var size = $modal.find("select").val();
 			$el.removeClass().addClass('form-group').addClass('draggable').addClass('ui-draggable').addClass('dropped').addClass('col-xs-'+size);
+			$modal.modal("hide");
+			return false;
+		})
+	});
+	
+	$(document).on("click", ".edit-css", function(ev) {
+		var $el = $(this).parent().parent();
+		var modal_id = '#modal-'+$el.attr("id")+'-css';
+		if(!$(modal_id).length){
+			var $modal = get_modal($el.attr("id"), "CSS", $el.attr("data-size")).modal("show");
+		}else{
+			var $modal = $(modal_id).modal("show");
+			
+		}
+		$modal.find(".btn-success").click(function() {
 			$modal.modal("hide");
 			return false;
 		})
@@ -210,6 +226,7 @@
 		</div>
 		<div class="row">
 			<div class="col-md-12">
+				<p id="message" name="message" style="color: red;"></p>
 				<form role="form-inline">
 					<textarea rows="15" class="form-control" id="update" @input='update' style="display: none;"></textarea>
 				</form>
@@ -233,8 +250,13 @@
 		},
 		methods: {
 			update: function(event){
-				this.elements = JSON.parse(event.target.value);
-				$(".col-md-12.droppable.sortable").text("");
+				try {
+					this.elements = JSON.parse(event.target.value);
+					$(".col-md-12.droppable.sortable").text("");
+					$("#message").text("");
+				}catch(err){
+					$("#message").text("Error Parsing JSON");
+				}
 			}
 		}
 	})

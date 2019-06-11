@@ -20,8 +20,7 @@
 	</style>
 	<script>
 	$(document).ready(function() {
-		setup_draggable();	
-		
+		setup_draggable();
 	});
 	var space = 1;
 	var setup_draggable = function() {
@@ -58,7 +57,7 @@
 			}
 		}).sortable();
 	}
-	
+	// Update modal need to add
 	var get_modal = function(modal_id, type, modal_value) {
 		if(typeof(type) == "string"){
 			var modal_html = '<div id="modal-'+modal_id+'-'+type+'" class="modal" style="overflow: auto;" tabindex="-1">';
@@ -81,7 +80,14 @@
 			}else if(type == "CSS"){
 				modal_html +=						'<button class="btn btn-success">Close</button>';
 			}else if(type == "Export"){
-				modal_html +=						'<p class="col-xs-10">'+modal_value+'</p>';
+				modal_html +=						'<div class="form-group col-xs-10">';
+				modal_html +=						'<p class="col-xs-10">';
+													$.each(modal_value, function(filter, filter_array) {
+				modal_html +=							"Filter ID : " + filter_array.filter_id + "<br />";
+				modal_html +=							"Filter Size : " + filter_array.size + "<br />";
+													});
+				modal_html +=						'</p>';
+				modal_html +=						'</div>';
 				modal_html +=						'<button class="btn btn-success">Close</button>';
 			}
 				modal_html +=					'</div>';
@@ -100,7 +106,6 @@
 			var $modal = get_modal($el.attr("id"), "Size", $el.attr("data-size")).modal("show");
 		}else{
 			var $modal = $(modal_id).modal("show");
-			
 		}
 		$modal.find(".btn-success").click(function() {
 			var size = $modal.find("select").val();
@@ -112,17 +117,16 @@
 	
 	$(document).on("click", ".edit-css", function(ev) {
 		var $el = $(this).parent().parent();
-		var modal_id = '#modal-'+$el.attr("id")+'-css';
+		var modal_id = '#modal-'+$el.attr("id")+'-CSS';
 		if(!$(modal_id).length){
 			var $modal = get_modal($el.attr("id"), "CSS", $el.attr("data-size")).modal("show");
 		}else{
 			var $modal = $(modal_id).modal("show");
-			
 		}
 		$modal.find(".btn-success").click(function() {
 			$modal.modal("hide");
 			return false;
-		})
+		});
 	});
 	
 	$(document).on("click", ".remove-link", function(ev) {
@@ -155,13 +159,21 @@
 		if($("#exportable").text() !== ""){
 			$("#exportable").find(".dropped").clone().each(function(index, value){
 				exporting[index] = [];
-				//console.log(value);
-				//console.log(index);
 				exporting[index]['filter_id'] = $(value).attr("id").replace("_draggable","");
 				exporting[index]['size'] = $(value).removeClass("form-group draggable ui-draggable dropped").attr('class').replace("col-xs-","");
 			});
+			var modal_id = '#modal-Export-Export';
+			if(!$(modal_id).length){
+				var $modal = get_modal("Export", "Export", exporting).modal("show");
+			}else{
+				var $modal = $(modal_id).modal("show");
+			}
+			$modal.find(".btn-success").click(function() {
+				$modal.modal("hide");
+				return false;
+			});
+			console.log(exporting);
 		}
-		console.log(exporting);
 	});
 	</script>
 </head>
@@ -209,7 +221,7 @@
 								</select>
 							</template>
 							<template v-if="element.desc !== ''">
-								<p class="help-block">{{ element.desc }}</p>
+								<p class="help-block">{{ element.description }}</p>
 							</template>
 						</div>
 					</template>

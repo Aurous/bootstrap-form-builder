@@ -17,22 +17,23 @@
 		.draggable { cursor: move; }
 		.form-group.dropped{ height: 100px; }
 		.container { max-width: 1500px !important; }
+		.boundary { border: 1px solid rgb(0, 0, 0); }
 	</style>
 	<script>
 	$(document).ready(function() {
 		setup_draggable();
 	});
 	var space = 1;
-	var setup_draggable = function() {
-		$( ".draggable" ).draggable({
+	var setup_draggable = function(){
+		$(".draggable").draggable({
 			appendTo: "body",
 			helper: "clone"
 		});
-		$( ".droppable" ).droppable({
+		$(".droppable").droppable({
 			accept: ".draggable",
 			helper: "clone",
 			hoverClass: "droppable-active",
-			drop: function( event, ui ) {
+			drop: function(event, ui){
 				$(".empty-form").remove();
 				var $orig = $(ui.draggable)
 				if(!$orig.hasClass("dropped")) {
@@ -48,7 +49,7 @@
 							$('<p class="tools"><a class="remove-link">Remove</a> | <a class="edit-size">Size</a> | <a class="edit-css">CSS</a> | <a class="edit=events">Events</a> | <a class="add-border">Border</a></p>').appendTo($el);
 						}
 					}
-				} else {
+				}else{
 					if($(this)[0]!=$orig.parent()[0]){
 						var $el = $orig.clone().css({"position": "static", "left": null, "right": null}).appendTo(this);
 						$orig.remove();
@@ -58,58 +59,27 @@
 		}).sortable();
 	}
 	
-	var get_modal = function(modal_id, type, modal_value) {
-		if(typeof(type) == "string"){
-			var modal_html = '<div id="modal-'+modal_id+'-'+type+'" class="modal" style="overflow: auto;" tabindex="-1">';
-				modal_html +=		'<div class="modal-dialog">';
-				modal_html +=				'<div class="modal-content">';
-				modal_html +=					'<div class="modal-header">';
-				modal_html +=						'<a type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</a>';
-				modal_html +=						'<h4 class="modal-title">Change '+type+'</h4>';
-				modal_html +=					'</div>';
-				modal_html +=					'<div class="modal-body ui-front">';
-			if(type == "Size"){
-				modal_html +=						'<div class="form-group col-xs-10">';
-				modal_html +=							'<select class="form-control" id="n-columns">';
-														$.each(modal_value.split(","),function(key, value){
-				modal_html +=								 "<option value="+value+">"+value+"</option>";
-														});
-				modal_html +=							'</select>';
-				modal_html +=						'</div>';
-				modal_html +=						'<button class="btn btn-success">Change</button>';
-			}else if(type == "CSS"){
-				modal_html +=						'<button class="btn btn-success">Close</button>';
-			}else if(type == "Export"){
-				modal_html +=						'<div class="form-group col-xs-10">';
-				modal_html +=						'<p class="col-xs-10">';
-													$.each(modal_value, function(filter, filter_array) {
-				modal_html +=							"Filter ID : " + filter_array.filter_id + "<br />";
-				modal_html +=							"Filter Size : " + filter_array.size + "<br />";
-													});
-				modal_html +=						'</p>';
-				modal_html +=						'</div>';
-				modal_html +=						'<button class="btn btn-success">Close</button>';
-			}
-				modal_html +=					'</div>';
-				modal_html +=				'</div>';
-				modal_html +=			'</div>';
-				modal_html +=		'</div>';
-			return modal = $(modal_html).appendTo(document.body);
+	function get_modal(title, body, footer){
+		if(title !== "" && body !== "" && footer !== ""){
+			$('.modal-title').html(title)
+			$('.modal-body').html(body);
+			$('.modal-footer').html(footer);
+			return $("#modal");
 		}
-	};
+		return false;
+	}
 	
-	<!-- function update_modal(modal_id, type, modal_value){ -->
-		
-	<!-- }; -->
 	
 	$(document).on("click", ".edit-size", function(ev) {
 		var $el = $(this).parent().parent();
-		var modal_id = '#modal-'+$el.attr("id")+'-Size';
-		if(!$(modal_id).length){
-			var $modal = get_modal($el.attr("id"), "Size", $el.attr("data-size")).modal("show");
-		}else{
-			var $modal = $(modal_id).modal("show");
-		}
+		var modal_body =	'<div class="form-group col-xs-10">\
+								<select class="form-control" id="n-columns">';
+								$.each($el.attr("data-size").split(","),function(key, value){
+		modal_body +=				"<option value="+value+">"+value+"</option>";
+								 });
+		modal_body +=			'</select>\
+							</div>';
+		var $modal = get_modal('Change Size', modal_body, '<button class="btn btn-success">Change</button>').modal("show");
 		$modal.find(".btn-success").click(function() {
 			var size = $modal.find("select").val();
 			$el.removeClass().addClass('form-group').addClass('draggable').addClass('ui-draggable').addClass('dropped').addClass('col-xs-'+size);
@@ -120,12 +90,8 @@
 	
 	$(document).on("click", ".edit-css", function(ev) {
 		var $el = $(this).parent().parent();
-		var modal_id = '#modal-'+$el.attr("id")+'-CSS';
-		if(!$(modal_id).length){
-			var $modal = get_modal($el.attr("id"), "CSS", $el.attr("data-size")).modal("show");
-		}else{
-			var $modal = $(modal_id).modal("show");
-		}
+		var $modal = get_modal('Change Size', '<p>CSS</p>', '<button class="btn btn-success">Close</button>').modal("show");
+		console.log($modal);
 		$modal.find(".btn-success").click(function() {
 			$modal.modal("hide");
 			return false;
@@ -133,28 +99,15 @@
 	});
 	
 	$(document).on("click", ".remove-link", function(ev) {
-		$removing = $(this).parent().parent();
-		var modal_remove = "#modal-"+$removing.attr("id");
-		$removing.remove();
-		if($(modal_remove).length){
-			$(modal_remove).remove();
-		}
+		$removing = $(this).parent().parent().remove();
 	});
 	
 	$(document).on("click", ".add-border", function(){
-		if($(this).parent().parent().css("border") == "1px solid rgb(0, 0, 0)"){
-			$(this).parent().parent().css("border","");
-		}else{
-			$(this).parent().parent().css("border", "1px solid rgb(0, 0, 0)");
-		}
+		$(this).parent().parent().toggleClass("boundary");
 	});
 	
 	$(document).on("click", ".show-advanced", function(){
-		if($("#update").css("display") == "none"){
-			$("#update").show();
-		}else{
-			$("#update").hide();
-		}
+		$("#update").toggle();
 	});
 	
 	$(document).on("click", "#export", function(){
@@ -164,16 +117,6 @@
 				exporting[index] = [];
 				exporting[index]['filter_id'] = $(value).attr("id").replace("_draggable","");
 				exporting[index]['size'] = $(value).removeClass("form-group draggable ui-draggable dropped").attr('class').replace("col-xs-","");
-			});
-			var modal_id = '#modal-Export-Export';
-			if(!$(modal_id).length){
-				var $modal = get_modal("Export", "Export", exporting).modal("show");
-			}else{
-				var $modal = $(modal_id).modal("show");
-			}
-			$modal.find(".btn-success").click(function() {
-				$modal.modal("hide");
-				return false;
 			});
 			console.log(exporting);
 		}
@@ -258,6 +201,23 @@
 				<form role="form-inline">
 					<textarea rows="15" class="form-control" id="update" @input='update' style="display: none;"></textarea>
 				</form>
+			</div>
+		</div>
+	</div>
+	<div class="modal fade" id="modal" role="dialog">
+		<div class="modal-dialog">
+			<!-- Modal content-->
+			<div class="modal-content">
+				<div class="modal-header">
+					<button type="button" class="close" data-dismiss="modal">&times;</button>
+					<h4 class="modal-title"></h4>
+				</div>
+				<div class="modal-body">
+
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+				</div>
 			</div>
 		</div>
 	</div>

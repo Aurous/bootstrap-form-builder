@@ -6,10 +6,13 @@
 	<title>Bootstrap 3 Form Builder</title>
 	<link rel="stylesheet" href="css/jquery.ui.theme.css" />
 	<link rel="stylesheet" href="css/bootstrap.css" />
+	<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.9.0/css/all.css" crossorigin="anonymous">
 	<script src="js/jquery.min.js"></script>
 	<script src="js/vue.js"></script>
 	<script src="js/jquery.ui.min.js"></script>
 	<script src="js/bootstrap.js"></script>
+	
+
 	<style>
 		.droppable-active { background-color: #ffe !important; }
 		.tools a { cursor: pointer; font-size: 80%; }
@@ -23,7 +26,6 @@
 	$(document).ready(function() {
 		setup_draggable();
 	});
-	var space = 1;
 	var setup_draggable = function(){
 		$(".draggable").draggable({
 			appendTo: "body",
@@ -36,23 +38,15 @@
 			drop: function(event, ui){
 				$(".empty-form").remove();
 				var $orig = $(ui.draggable)
-				if(!$orig.hasClass("dropped")) {
-					if(!$("#"+$orig.attr('id')+".dropped").length){
-						var col_size = $(ui.draggable).attr('data-size').split(",");
-						var $el  = $orig.clone().addClass("dropped").addClass("col-xs-"+col_size[0]).css({"position": "static", "left": null, "right": null}).appendTo(this);
-						$($el).find("p").remove();
-						if($($el).attr("id") == "space"){
-							$el.attr("id","space-"+space);
-							space++;
-							$('<p class="tools"><a class="remove-link">Remove</a> | <a class="edit-size">Size</a> | <a class="add-border">Border</a></p>').appendTo($el);
-						}else{
-							$('<p class="tools"><a class="remove-link">Remove</a> | <a class="edit-size">Size</a> | <a class="edit-css">CSS</a> | <a class="edit=events">Events</a> | <a class="add-border">Border</a></p>').appendTo($el);
-						}
-					}
-				}else{
-					if($(this)[0]!=$orig.parent()[0]){
-						var $el = $orig.clone().css({"position": "static", "left": null, "right": null}).appendTo(this);
-						$orig.remove();
+				if(!$orig.hasClass("dropped") && !$("#"+$orig.attr('id')+".dropped").length || $orig.attr("id") == "space") {
+					var col_size = $orig.attr('data-size').split(",");
+					var $el  = $orig.clone().addClass("dropped").addClass("col-xs-"+col_size[0]).appendTo(this);
+					$($el).find("p.help-block").remove();
+					$('<p class="tools"><a class="remove-link">Remove <i class="far fa-trash-alt"></i></a> <a class="edit-size">Size <i class="far fa-edit"></i></a> <a class="edit-css">CSS <i class="far fa-edit"></i></a> <a class="edit-events">Events <i class="far fa-edit"></i></a> <a class="add-border">Border <i class="fas fa-border-style"></i></a></p>').appendTo($el);
+					if($el.attr("id") == "space"){
+						$el.find("a").remove(".edit-css").remove(".edit-events");
+					}else if($el.attr("id") == "advanced"){
+						$el.find("a").remove(".edit-size").remove(".edit-css").remove(".edit-events");
 					}
 				}
 			}
@@ -69,20 +63,18 @@
 		return false;
 	}
 	
-	
 	$(document).on("click", ".edit-size", function(ev) {
 		var $el = $(this).parent().parent();
-		var modal_body =	'<div class="form-group col-xs-10">\
-								<select class="form-control" id="n-columns">';
-								$.each($el.attr("data-size").split(","),function(key, value){
-		modal_body +=				"<option value="+value+">"+value+"</option>";
-								 });
-		modal_body +=			'</select>\
-							</div>';
+		var boundary_css = ($el.hasClass("boundary")) ? true : false;
+		var modal_body = '<div class="form-group col-xs-10"><select class="form-control" id="n-columns">';
+			$.each($el.attr("data-size").split(","),function(key, value){
+				modal_body += "<option value="+value+">"+value+"</option>";
+			});
+			modal_body += '</select></div>';
 		var $modal = get_modal('Change Size', modal_body, '<button class="btn btn-success">Change</button>').modal("show");
 		$modal.find(".btn-success").click(function() {
-			var size = $modal.find("select").val();
-			$el.removeClass().addClass('form-group').addClass('draggable').addClass('ui-draggable').addClass('dropped').addClass('col-xs-'+size);
+			$el.removeClass().addClass('form-group').addClass('draggable').addClass('ui-draggable').addClass('dropped').addClass('col-xs-'+$modal.find("select").val());
+			if(boundary_css){ $el.addClass("boundary"); }
 			$modal.modal("hide");
 			return false;
 		})
@@ -106,17 +98,13 @@
 		$(this).parent().parent().toggleClass("boundary");
 	});
 	
-	$(document).on("click", ".show-advanced", function(){
-		$("#update").toggle();
-	});
-	
 	$(document).on("click", "#export", function(){
 		var exporting = [];
 		if($("#exportable").text() !== ""){
 			$("#exportable").find(".dropped").clone().each(function(index, value){
 				exporting[index] = [];
 				exporting[index]['filter_id'] = $(value).attr("id").replace("_draggable","");
-				exporting[index]['size'] = $(value).removeClass("form-group draggable ui-draggable dropped").attr('class').replace("col-xs-","");
+				exporting[index]['size'] = $(value).removeClass("form-group draggable ui-draggable dropped boundary").attr('class').replace("col-xs-","");
 			});
 			console.log(exporting);
 		}
@@ -175,6 +163,10 @@
 						<span>Spacing Element</span>
 						<p class="help-block">Object used to space items apart</p>
 					</div>
+					<div id="advanced" class="form-group draggable" data-size="12">
+						<span>Advanced Options Below</span>
+						<p class="help-block">Seperate elements into collapsable menu</p>
+					</div>
 				</form>
 			</div>
 			<div class="col-md-8">
@@ -190,23 +182,14 @@
 				<form role="form-inline">
 					<input class="form-control " type="button" id="export" name="export" value="Export">
 					<br />
-					<input class="form-control show-advanced" type="button" id="advanced" name="advanced" value="Advanced">
+					<input class="form-control show-preview" type="button" id="preview" name="preview" value="Preview">
 				</form>
 				<br />
-			</div>
-		</div>
-		<div class="row">
-			<div class="col-md-12">
-				<p id="message" name="message" style="color: red;"></p>
-				<form role="form-inline">
-					<textarea rows="15" class="form-control" id="update" @input='update' style="display: none;"></textarea>
-				</form>
 			</div>
 		</div>
 	</div>
 	<div class="modal fade" id="modal" role="dialog">
 		<div class="modal-dialog">
-			<!-- Modal content-->
 			<div class="modal-content">
 				<div class="modal-header">
 					<button type="button" class="close" data-dismiss="modal">&times;</button>
@@ -236,19 +219,7 @@
 				{"id":6,"filter_id":"search_data_number","filter_name":"search_data_number","label":"Number Search","description":"","filter_type_name":"text","colsize":[2,3,4,5,6,7,8,9,10,11,12],"options":[],"attributes":[],"style_attributes":[],"events":[]},
 				{"id":7,"filter_id":"location_id","filter_name":"location_id","label":"Lab","description":"","filter_type_name":"select","colsize":[3,4,5,6,7,8,9,10,11,12],"options":[{"name":"All Labs","value":"","is_default":"N"},{"name":"Medscan","value":35,"is_default":"N"},{"name":"Altru","value":41,"is_default":"N"}],"attributes":[],"style_attributes":[],"events":[]}
 			]
-		},
-		methods: {
-			update: function(event){
-				try {
-					this.elements = JSON.parse(event.target.value);
-					$(".col-md-12.droppable.sortable").text("");
-					$("#message").text("");
-				}catch(err){
-					$("#message").text("Error Parsing JSON");
-				}
-			}
 		}
 	})
-	$("#update").append(JSON.stringify(element_vue.elements));
 </script>
 </html>

@@ -63,14 +63,33 @@
 		return false;
 	}
 	
+	function get_export(exporting = {}){
+		if($("#exportable").text() !== ""){
+			var advanced = false;
+			$("#exportable").find(".dropped").clone().each(function(index, value){
+				var filter_id = $(value).attr("id").replace("_draggable","");
+				var size = $(value).removeClass("form-group draggable ui-draggable dropped boundary").attr('class').replace("col-xs-","");
+				if(filter_id == "advanced"){
+					advanced = true;
+				}else{
+					exporting[index] = {};
+					exporting[index]['filter_id'] = filter_id;
+					exporting[index]['size'] = size;
+					exporting[index]['advanced'] = (advanced) ? true : false;
+				}
+			});
+			return exporting;
+		}
+	}
+	
 	$(document).on("click", ".edit-size", function(ev) {
 		var $el = $(this).parent().parent();
 		var boundary_css = ($el.hasClass("boundary")) ? true : false;
-		var modal_body = '<div class="form-group col-xs-10"><select class="form-control" id="n-columns">';
+		var modal_body = '<select class="form-control" id="n-columns">';
 			$.each($el.attr("data-size").split(","),function(key, value){
 				modal_body += "<option value="+value+">"+value+"</option>";
 			});
-			modal_body += '</select></div>';
+			modal_body += '</select>';
 		var $modal = get_modal('Change Size', modal_body, '<button class="btn btn-success">Change</button>').modal("show");
 		$modal.find(".btn-success").click(function() {
 			$el.removeClass().addClass('form-group').addClass('draggable').addClass('ui-draggable').addClass('dropped').addClass('col-xs-'+$modal.find("select").val());
@@ -98,16 +117,31 @@
 		$(this).parent().parent().toggleClass("boundary");
 	});
 	
+	$(document).on("click", ".show-preview", function(){
+		var json = [];
+		$.each(get_export(),function(index, filter){
+			json[index] = filter;
+		});
+		console.log(json);
+		$.ajax({
+			method: "POST",
+			url: "build_form.php",
+			data: {"filters":JSON.stringify(json)},
+			success: function(result){
+				var $modal = get_modal("Preview", result, '<button class="btn btn-success">Close</button>').modal("show");
+				$modal.find(".btn-success").click(function() {
+					$modal.modal("hide");
+					return false;
+				});
+			}
+		});
+	});
+
 	$(document).on("click", "#export", function(){
-		var exporting = [];
-		if($("#exportable").text() !== ""){
-			$("#exportable").find(".dropped").clone().each(function(index, value){
-				exporting[index] = [];
-				exporting[index]['filter_id'] = $(value).attr("id").replace("_draggable","");
-				exporting[index]['size'] = $(value).removeClass("form-group draggable ui-draggable dropped boundary").attr('class').replace("col-xs-","");
-			});
-			console.log(exporting);
-		}
+		$.each(get_export(),function(index, value){
+			console.log(index);
+			console.log(value);
+		})
 	});
 	</script>
 </head>
@@ -189,7 +223,7 @@
 		</div>
 	</div>
 	<div class="modal fade" id="modal" role="dialog">
-		<div class="modal-dialog">
+		<div class="modal-dialog modal-lg" role="document">
 			<div class="modal-content">
 				<div class="modal-header">
 					<button type="button" class="close" data-dismiss="modal">&times;</button>

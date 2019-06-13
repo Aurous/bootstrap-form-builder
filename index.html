@@ -14,11 +14,18 @@
 	<style>
 		.droppable-active { background-color: #ffe !important; height: 85vh !important;}
 		.tools a { cursor: pointer; font-size: 80%; }
-		.overflow-control { height: 90vh; overflow-y:auto !important;  }
+		.overflow-control { height: 90vh; overflow: hidden;  }
 		.draggable { cursor: move; }
 		.form-group.dropped{ height: 100px; }
-		.container { width: 95vw !important; }
+		.container { width: 99vw !important; }
 		.boundary { border: 1px solid rgb(0, 0, 0); }
+		::-webkit-scrollbar { width: 10px; }
+		::-webkit-scrollbar-track { background: #f1f1f1; }
+		::-webkit-scrollbar-thumb { background: #888; }
+		::-webkit-scrollbar-thumb:hover { background: #555; }
+		.bottom-70 { height: 70vh; }
+		.bottom-75 { height: 75vh; }
+		div.bottom:hover { overflow-y: scroll; }
 	</style>
 	<script>
 	$(document).ready(function() {
@@ -152,7 +159,9 @@
 	});
 	
 	$(document).on("click", ".toggle-search", function(){
-		$(".search-filter").toggle();
+		$(".search-filter").toggle().val("").keyup();
+		$(".bottom").toggleClass("bottom-75").toggleClass("bottom-70");
+		
 	});
 	</script>
 </head>
@@ -160,10 +169,13 @@
 	<div id="vue" class="container">
 		<div class="row">
 			<br />
-			<div  class="col-md-2 filters overflow-control" style="background-color: #fff;">
+			<div class="col-md-2" style="background-color: #fff; height: 90vh;">
+				<div class="top">
 				<h3>Elements<br /><h4><a class="toggle-search">Search Filters</a></h4></h3>
 				<input id="search-filter" class="form-control search-filter" type="text" placeholder="Search Filters..." style="display: none; margin-bottom: 10px;">
-				<form role="form" class="searchable">
+				</div>
+				<div class="overflow-control bottom bottom-75">
+				<form role="form" class="searchable filters">
 					<template v-for="element in elements">
 						<div v-bind:id="element.filter_id+'_draggable'" v-bind:data-size="element.colsize" class="form-group draggable">
 							<template v-if="element.label !== ''">
@@ -214,12 +226,13 @@
 						<p class="help-block">Seperate elements into collapsable menu</p>
 					</div>
 				</form>
+				</div>
 			</div>
 			<div class="col-md-8" style="height: 90vh;">
 				<div style="background-color: #fff; padding: 20px; height: 90vh;">
 					<div class="row form-body form">
 						<div class="col-md-12 droppable sortable overflow-control" id="exportable">
-								<div class="text-muted empty-form text-center" style="font-size: 24px;">Drag & Drop elements to build form.</div>
+							<div class="text-muted empty-form text-center" style="font-size: 24px;">Drag & Drop elements to build form.</div>
 						</div>
 					</div>
 				</div>

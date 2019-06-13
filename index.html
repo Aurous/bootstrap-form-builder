@@ -11,15 +11,13 @@
 	<script src="js/vue.js"></script>
 	<script src="js/jquery.ui.min.js"></script>
 	<script src="js/bootstrap.js"></script>
-	
-
 	<style>
-		.droppable-active { background-color: #ffe !important; }
+		.droppable-active { background-color: #ffe !important; height: 85vh !important;}
 		.tools a { cursor: pointer; font-size: 80%; }
-		.form-body .col-md-12 { min-height: 500px !important; overflow-y:auto !important; max-height:500px !important; }
+		.overflow-control { height: 90vh; overflow-y:auto !important;  }
 		.draggable { cursor: move; }
 		.form-group.dropped{ height: 100px; }
-		.container { max-width: 1500px !important; }
+		.container { width: 95vw !important; }
 		.boundary { border: 1px solid rgb(0, 0, 0); }
 	</style>
 	<script>
@@ -37,7 +35,7 @@
 			hoverClass: "droppable-active",
 			drop: function(event, ui){
 				$(".empty-form").remove();
-				var $orig = $(ui.draggable)
+				var $orig = $(ui.draggable);
 				if(!$orig.hasClass("dropped") && !$("#"+$orig.attr('id')+".dropped").length || $orig.attr("id") == "space") {
 					var col_size = $orig.attr('data-size').split(",");
 					var $el  = $orig.clone().addClass("dropped").addClass("col-xs-"+col_size[0]).appendTo(this);
@@ -48,17 +46,18 @@
 					}else if($el.attr("id") == "advanced"){
 						$el.find("a").remove(".edit-size").remove(".edit-css").remove(".edit-events");
 					}
-					$(".search-filter").val("").toggle().keyup();
+					$(".search-filter").val("").hide().keyup();
 				}
 			}
 		}).sortable();
 	}
 	
-	function get_modal(title, body, footer){
+	function get_modal(title, body, footer, size = "sm"){
 		if(title !== "" && body !== "" && footer !== ""){
 			$('.modal-title').html(title)
 			$('.modal-body').html(body);
 			$('.modal-footer').html(footer);
+			$('.modal-dialog').removeClass().addClass("modal-dialog").addClass("modal-"+size);
 			return $("#modal");
 		}
 		return false;
@@ -136,7 +135,7 @@
 			url: "build_form.php",
 			data: {"filters":JSON.stringify(json)},
 			success: function(result){
-				var $modal = get_modal("Preview", result, '<button class="btn btn-success">Close</button>').modal("show");
+				var $modal = get_modal("Preview", result, '<button class="btn btn-success">Close</button>', "lg").modal("show");
 				$modal.find(".btn-success").click(function() {
 					$modal.modal("hide");
 					return false;
@@ -161,10 +160,10 @@
 	<div id="vue" class="container">
 		<div class="row">
 			<br />
-			<div  class="col-md-2 filters" style="background-color: #fff;">
+			<div  class="col-md-2 filters overflow-control" style="background-color: #fff;">
 				<h3>Elements<br /><h4><a class="toggle-search">Search Filters</a></h4></h3>
 				<input id="search-filter" class="form-control search-filter" type="text" placeholder="Search Filters..." style="display: none; margin-bottom: 10px;">
-				<form role="form-inline" class="searchable">
+				<form role="form" class="searchable">
 					<template v-for="element in elements">
 						<div v-bind:id="element.filter_id+'_draggable'" v-bind:data-size="element.colsize" class="form-group draggable">
 							<template v-if="element.label !== ''">
@@ -216,15 +215,16 @@
 					</div>
 				</form>
 			</div>
-			<div class="col-md-8">
-				<div style="background-color: #fff; padding: 20px; ">
-					<div class="text-muted empty-form text-center" style="font-size: 24px;">Drag & Drop elements to build form.</div>
-					<div class="row form-body  form-inline">
-						<div class="col-md-12 droppable sortable" id="exportable"></div>
+			<div class="col-md-8" style="height: 90vh;">
+				<div style="background-color: #fff; padding: 20px; height: 90vh;">
+					<div class="row form-body form">
+						<div class="col-md-12 droppable sortable overflow-control" id="exportable">
+								<div class="text-muted empty-form text-center" style="font-size: 24px;">Drag & Drop elements to build form.</div>
+						</div>
 					</div>
 				</div>
 			</div>
-			<div class="col-md-2" style="background-color: #fff;">
+			<div class="col-md-2 overflow-control" style="background-color: #fff;">
 				<br />
 				<form role="form-inline">
 					<input class="form-control " type="button" id="export" name="export" value="Export">
@@ -243,7 +243,6 @@
 					<h4 class="modal-title"></h4>
 				</div>
 				<div class="modal-body">
-
 				</div>
 				<div class="modal-footer">
 					<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>

@@ -48,6 +48,7 @@
 					}else if($el.attr("id") == "advanced"){
 						$el.find("a").remove(".edit-size").remove(".edit-css").remove(".edit-events");
 					}
+					$(".search-filter").val("").toggle().keyup();
 				}
 			}
 		}).sortable();
@@ -81,6 +82,13 @@
 			return exporting;
 		}
 	}
+		
+	$(document).on("keyup", ".search-filter", function(){
+		var value = $(this).val().toLowerCase();
+		$(".searchable div").filter(function() {
+			$(this).toggle($(this).text().toLowerCase().indexOf(value) > -1)
+		});
+	});
 	
 	$(document).on("click", ".edit-size", function(ev) {
 		var $el = $(this).parent().parent();
@@ -143,6 +151,10 @@
 			console.log(value);
 		})
 	});
+	
+	$(document).on("click", ".toggle-search", function(){
+		$(".search-filter").toggle();
+	});
 	</script>
 </head>
 <body style="background-color: #ddd;">
@@ -150,8 +162,9 @@
 		<div class="row">
 			<br />
 			<div  class="col-md-2 filters" style="background-color: #fff;">
-				<h3>Elements</h3>
-				<form role="form-inline">
+				<h3>Elements<br /><h4><a class="toggle-search">Search Filters</a></h4></h3>
+				<input id="search-filter" class="form-control search-filter" type="text" placeholder="Search Filters..." style="display: none; margin-bottom: 10px;">
+				<form role="form-inline" class="searchable">
 					<template v-for="element in elements">
 						<div v-bind:id="element.filter_id+'_draggable'" v-bind:data-size="element.colsize" class="form-group draggable">
 							<template v-if="element.label !== ''">

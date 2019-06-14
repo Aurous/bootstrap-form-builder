@@ -44,7 +44,7 @@
 			drop: function(event, ui){
 				$(".empty-form").remove();
 				var $orig = $(ui.draggable);
-				if(!$orig.hasClass("dropped") && !$("#"+$orig.attr('id')+".dropped").length || $orig.attr("id") == "space") {
+				if(!$orig.hasClass("dropped") || $orig.attr("id") == "space" && !$("#"+$orig.attr('id')+".dropped").length) {
 					var col_size = $orig.attr('data-size').split(",");
 					var $el  = $orig.clone().addClass("dropped").addClass("col-xs-"+col_size[0]).appendTo(this);
 					$($el).find("p.help-block").remove();
